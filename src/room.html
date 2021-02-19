@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minimal working example</title>
+</head>
+<body>
+
+<!-- chatbox -->
+<div class="chat"> 
+    <ul id="chats"></ul>
+    <input id="chattext" name="chattext" type="text"></input>
+</div>
+
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const $events = document.getElementById('events');
+
+    const newItem = (content) => {
+      const item = document.createElement('li');
+      item.innerText = content;
+      return item;
+    };
+
+    const socket = io();
+
+    socket.on('connect', () => {
+      $events.appendChild(newItem('connect'));
+    });
+
+    socket.on('servertoclient', (data) => {
+      console.log("incoming");
+      $events.appendChild(newItem(data));
+    })
+
+    // Get the input field
+    var input = document.getElementById("chattext");
+
+    // Execute a function when the user releases a key on the keyboard
+    input.addEventListener("keyup", function(event) {
+      // Number 13 is the "Enter" key on the keyboard
+      if (event.keyCode === 13) {
+        console.log(input.value);
+
+        // // Cancel the default action, if needed
+        // event.preventDefault();
+        // Trigger the button element with a click
+        var something = socket.emit('clienttoserver', input.value);
+        console.log(something);
+
+        input.value = '';
+      }
+    });
+    
+    
+</script>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minimal working example</title>
+</head>
+<body>
+  
+  <ul id="rooms"></ul>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+      // Make room
+      const newRoom = (number) => {
+        const item = document.createElement('li');
+        input = document.createElement('input');
+        input.type = "submit";
+        input.value = "Room "+number;
+        item.appendChild(input)
+        // // const input = 
+        // item.innerText = "Room "+number;
+        return item;
+      };
+
+      // Make room buttons
+      var n_rooms = 4;
+      const $rooms = document.getElementById('rooms');
+      for (let i = 0; i < n_rooms; i++) {
+        console.log(i);
+        $rooms.appendChild(newRoom(i+1));
+      }
+
+        const socket = io();
+
+        $('#room1').click(function() {
+            // socket.emit('chat message', $('#m').val());
+            console.log("Press button");
+        });
+
+        socket.on('connect', () => {
+          $events.appendChild(newItem('connect'));
+        });
+
+        socket.on('servertoclient', (data) => {
+          console.log("incoming");
+          $events.appendChild(newItem(data));
+        })
+
+        // Get the input field
+        var input = document.getElementById("chattext");
+
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function(event) {
+          // Number 13 is the "Enter" key on the keyboard
+          if (event.keyCode === 13) {
+            console.log(input.value);
+
+            // // Cancel the default action, if needed
+            // event.preventDefault();
+            // Trigger the button element with a click
+            var something = socket.emit('clienttoserver', input.value);
+            console.log(something);
+
+            input.value = '';
+          }
+        });
+        
+        
+    </script>
+</body>
+</html>
