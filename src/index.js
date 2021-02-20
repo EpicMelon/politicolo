@@ -1,11 +1,14 @@
-const app = require('express')();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const users = require('socket.io.users');
+// initializing express-session middleware
+var Session = require('express-session');
+var SessionStore = require('session-file-store')(Session);
+var session = Session({store: new SessionStore({path: __dirname+'/tmp/sessions'}), secret: 'pass', resave: true, saveUninitialized: true});
 
-var room_counts = {};
-var max_room_id = 1000;
+// create express app
+var express = require('express');
+var app = express();
+app.use(session);
 
+// Pages
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
@@ -14,9 +17,22 @@ app.get('/room/:code', (req, res) => {
   res.sendFile(__dirname + '/room.html');
 });
 
-io.on('connection', (socket) => {
-  socket.username = "Someone";
+// Attach express app to server
+var http = require('http');
+var server = http.createServer(app);
+server.listen(3000, "192.168.178.35", () => {
+  console.log('listening on *:3000');
+});
 
+// create new socket.io app
+var ios = require('socket.io-express-session');
+var io = require('socket.io')(server);
+io.use(ios(session)); // session support
+
+var room_counts = {};
+var max_room_id = 1000;
+
+io.on('connection', (socket) => {
   var room_id = "lobby";
 
   // --- Lobby ---
@@ -43,13 +59,13 @@ io.on('connection', (socket) => {
 
     io.to(room).emit("new user", room_counts[room]);
 
-    io.to(room_id).emit('status message', socket.username+" joined the room.");
+    io.to(room_id).emit('status message', socket.handshake.session.username + " joined the room.");
     console.log("[Room " + room_id + "] Someone joined");
   });
 
   // Chat in room
   socket.on('chat message', (msg) => {
-    io.to(room_id).emit('chat message', socket.username+": "+msg);
+    io.to(room_id).emit('chat message', socket.handshake.session.username + ": " + msg);
     console.log("[Room " + room_id + "] " + msg);
   });
 
@@ -62,18 +78,15 @@ io.on('connection', (socket) => {
      
     io.to(room_id).emit("new user", room_counts[room_id]);
 
-    io.to(room_id).emit('status message', socket.username+" left the room.");
+    io.to(room_id).emit('status message', "Someone left the room.");
     console.log("[Room " + room_id + "] Someone left");
   });
 
   // set username
   socket.on('set username', function (username) {
-    socket.username = username; // this dont work
+    socket.handshake.session.username = username;
+    socket.handshake.session.save();
 
-    console.log(socket.id);
+    console.log('Registered username: ' + socket.handshake.session.username);
   });
-});
-
-http.listen(3000, "192.168.178.24", () => {
-  console.log('listening on *:3000');
 });
