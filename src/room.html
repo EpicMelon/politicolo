@@ -21,13 +21,16 @@
     <h2 id="users online"> There is 1 user online</h2>
     <ul id="messages"></ul>
     <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
+      <input id="input" autocomplete="off" /> 
+      <button type="submit">Send</button> 
+      <button id="exit" type="button" style="color:red" onclick="toLobby()">Exit</button>
     </form>
   </body>
 
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
+
     var socket = io();
   
     var messages = document.getElementById('messages');
@@ -37,6 +40,10 @@
     var roomname_text = document.getElementById('roomname');
     var usersonline_text = document.getElementById('users online');
   
+    function toLobby() {
+      window.location = '/';
+    }
+
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       if (input.value) {
@@ -62,6 +69,14 @@
 
     socket.on('chat message', function(msg) {
       var item = document.createElement('li');
+      item.textContent = msg;
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    socket.on('status message', function(msg) {
+      var item = document.createElement('li');
+      item.style = "color:red";
       item.textContent = msg;
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);

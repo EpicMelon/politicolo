@@ -19,6 +19,7 @@
   <body>
     <h1>Politicolo</h1>
     <form id="form" action="">
+      <input id="username" placeholder="name">
       <button>Create Lobby</button>
     </form>
   </body>
@@ -30,11 +31,15 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
 
-      socket.emit('create_lobby');
-      
-      socket.on('goto', function(id) {
-        window.location.replace(window.location + "room/" + id);
-      });
+    if (document.getElementById('username').value != '') {
+        socket.emit('create_lobby');
+        socket.emit('set username', document.getElementById('username').value);
+        
+        socket.on('goto', function(id) {
+          window.location.replace(window.location + "room/" + id);
+        });
+        
+      }
 
     });
 
