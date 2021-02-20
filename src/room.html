@@ -18,6 +18,12 @@
 
   <body>
     <h1 id="roomname"> Text test</h1>
+    <div id="quiz">
+      <div><h2 id="question">question</h2></div>
+      <ul id="answers">
+      </ul>
+      <button id="beginQuiz" onclick="startQuiz()">Begin quiz</button>
+    </div>
     <h2 id="users online"> Er is 1 persoon op de lijn</h2>
     <ul id="messages"></ul>
     <form id="form" action="">
@@ -44,6 +50,15 @@
       window.location = '/';
     }
 
+    function startQuiz() {
+      var elem = document.getElementById("beginQuiz");
+      if (elem){
+        elem.parentNode.removeChild(elem);
+      }
+
+      socket.emit('new question');
+    }
+
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       if (input.value) {
@@ -51,6 +66,8 @@
         input.value = '';
       }
     });
+
+
 
     var room_name = window.location.pathname.toString().split("/")[2];
     socket.emit('joinroom', room_name);
@@ -81,4 +98,21 @@
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
     });
+
+
+    // QUIZOO
+    socket.on('show question', function(questionData) {
+      console.log(questionData);
+      // reset divjes
+      document.getElementById("answers").innerHTML = "";
+
+      // new data
+      document.getElementById("question").innerText = questionData.Question;
+      ["a", "b", "c", "d"].forEach(element => {
+        var item = document.createElement('button');
+        item.onclick = startQuiz;
+        item.textContent = element+": "+questionData.Answers[element];
+        document.getElementById("answers").appendChild(item);
+      });
+    })
   </script>

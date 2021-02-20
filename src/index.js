@@ -1,8 +1,14 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+// QUIZOOO
+// let questions = require('questions.json');
+var fs=require('fs');
+var data=fs.readFileSync('questions.json', 'utf8');
+var questions=JSON.parse(data);
 
 var room_counts = {};
+var question_count = {};
 var max_room_id = 1000;
 
 app.get('/', (req, res) => {
@@ -39,6 +45,7 @@ io.on('connection', (socket) => {
       room_counts[room] = 0;
     }
     room_counts[room] = room_counts[room] + 1;
+    question_count[room] = 0;
 
     io.to(room).emit("new user", room_counts[room]);
 
@@ -71,6 +78,17 @@ io.on('connection', (socket) => {
 
     console.log(socket.id);
   });
+
+  // --- Quizoo ---
+  socket.on('new question', function () {
+    q_data = questions[question_count[room_id]]
+
+    io.to(room_id).emit('show question', q_data);
+
+    // next question
+    question_count[room_id]++;
+  });
+
 });
 
 http.listen(3000, "192.168.178.24", () => {
