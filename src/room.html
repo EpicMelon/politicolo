@@ -18,12 +18,12 @@
 
   <body>
     <h1 id="roomname"> Text test</h1>
-    <h2 id="users online"> There is 1 user online</h2>
+    <h2 id="users online"> Er is 1 persoon op de lijn</h2>
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" /> 
-      <button type="submit">Send</button> 
-      <button id="exit" type="button" style="color:red" onclick="toLobby()">Exit</button>
+      <button type="submit">Verstuur</button> 
+      <button id="exit" type="button" style="color:red" onclick="toLobby()">Treed af</button>
     </form>
   </body>
 
@@ -55,15 +55,15 @@
     var room_name = window.location.pathname.toString().split("/")[2];
     socket.emit('joinroom', room_name);
 
-    document.title = "Room" + room_name;
-    roomname_text.textContent = "Welcome in room " + room_name;
+    document.title = room_name + "ste kamer";
+    roomname_text.textContent = "Welkom in de " + room_name + "ste kamer";
 
     socket.on("new user", function(data) {
       if ((data) == "1") {
-        usersonline_text.textContent = "You are alone in this lobby, invite your friends! please :)";
+        usersonline_text.textContent = "Je bent de enige in deze kamer, nodig je vrienden uit! Alsjeblieft :)";
       }
       else {
-        usersonline_text.textContent = "There are currently " + data + " users online";
+        usersonline_text.textContent = "Er zijn nu " + data + " kamerleden";
       }
     });
 

@@ -1,7 +1,6 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const users = require('socket.io.users');
 
 var room_counts = {};
 var max_room_id = 1000;
@@ -43,7 +42,7 @@ io.on('connection', (socket) => {
 
     io.to(room).emit("new user", room_counts[room]);
 
-    io.to(room_id).emit('status message', socket.username+" joined the room.");
+    io.to(room_id).emit('status message', socket.username+" is de kamer binnengekomen.");
     console.log("[Room " + room_id + "] Someone joined");
   });
 
@@ -62,7 +61,7 @@ io.on('connection', (socket) => {
      
     io.to(room_id).emit("new user", room_counts[room_id]);
 
-    io.to(room_id).emit('status message', socket.username+" left the room.");
+    io.to(room_id).emit('status message', socket.username+" heeft de kamer verlaten.");
     console.log("[Room " + room_id + "] Someone left");
   });
 
