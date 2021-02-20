@@ -1,32 +1,59 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>TEST ROOM WOW</title>
+    <title>De kamer!</title>
     <style>
       body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-      #input:focus { outline: none; }
-      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-
-      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages { list-style-type: none; margin: 0; padding: 0; width:100%; background-color: violet;}
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
+      #messages > li:nth-child(even) { background: #cfcfcf; }
     </style>
   </head>
 
-  <body>
-    <h1 id="roomname"> Text test</h1>
-    <h2 id="users online"> There is 1 user online</h2>
+  <body style="background-color: indigo;">
+
+    <center><h1 id="roomname" style="color:white; font-size: 60px;"> De 1829ste kamer</h1>
+      <h4 id="users online"  style="color:rgb(28, 182, 36); margin-top:-30px"> (Je bent alleen)</h2> </center>
+
+    <center><h3 style="color:wheat; margin-top:-10px">
+      Deel deze link met je partij: <a href="#" id="link" target="_blank" style="color:wheat">Link</a>
+    </h3></center>
+
+
+  <center>
+    <form id="username_form" action="">
+      <input id="username_input" autocomplete="off" placeholder="thiery B">
+      <button>Change name</button>
+    </form>
+    </center>
+
+    <div id="quiz" style="height:600px; float: left; width:40%; margin: 5% 5% 5% 15%; align-content: center; background-color: thistle;">
+      <div><center><h2 id="question" style="font-size: 50px; vertical-align: middle;">Doe de Quiz!</h2></div>
+      <ul id="answers">
+      </ul>
+      <button id="beginQuiz" onclick="startQuiz()">Begin quiz</button>
+    </div>
+
+    <div id="chateroni" style="height:600px; float: right; width:25%; margin: 5% 5% 5% 5%;  background-color: teal;">
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" /> 
-      <button type="submit">Send</button> 
-      <button id="exit" type="button" style="color:red" onclick="toLobby()">Exit</button>
-    </form>
+      <button type="submit">Verstuur</button> 
+      <button id="exit" type="button" style="color:red" onclick="toLobby()">Treed af</button>
+    </form></center>
+  </div>
   </body>
 
+
+
+  <script type="text/javascript">
+    window.onload = function(){
+        document.getElementById("link").href = window.location.toString();
+        document.getElementById("link").textContent = window.location.toString();
+    }
+    </script>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
@@ -37,11 +64,24 @@
     var form = document.getElementById('form');
     var input = document.getElementById('input');
 
+
+    var username_form = document.getElementById('username_form');
+    var username_input = document.getElementById('username_input');
+
     var roomname_text = document.getElementById('roomname');
     var usersonline_text = document.getElementById('users online');
   
     function toLobby() {
       window.location = '/';
+    }
+
+    function startQuiz() {
+      var elem = document.getElementById("beginQuiz");
+      if (elem){
+        elem.parentNode.removeChild(elem);
+      }
+
+      socket.emit('new question');
     }
 
     form.addEventListener('submit', function(e) {
@@ -52,18 +92,26 @@
       }
     });
 
+    username_form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (username_input.value) {
+        socket.emit('set username', username_input.value);;
+        username_input.value = '';
+      }
+    });
+
     var room_name = window.location.pathname.toString().split("/")[2];
     socket.emit('joinroom', room_name);
 
-    document.title = "Room" + room_name;
-    roomname_text.textContent = "Welcome in room " + room_name;
+    document.title = room_name + "ste kamer";
+    roomname_text.textContent = "de " + room_name + "ste kamer";
 
     socket.on("new user", function(data) {
       if ((data) == "1") {
-        usersonline_text.textContent = "You are alone in this lobby, invite your friends! please :)";
+        usersonline_text.textContent = "Je bent alleen";
       }
       else {
-        usersonline_text.textContent = "There are currently " + data + " users online";
+        usersonline_text.textContent = data + " kamerleden";
       }
     });
 
@@ -80,5 +128,27 @@
       item.textContent = msg;
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
+    });
+
+
+    // QUIZOO
+    socket.on('show question', function(questionData) {
+      console.log(questionData);
+      // reset divjes
+      document.getElementById("answers").innerHTML = "";
+
+      // new data
+      document.getElementById("question").innerText = questionData.Question;
+      ["a", "b", "c", "d"].forEach(element => {
+        var item = document.createElement('button');
+        item.onclick = startQuiz;
+        item.textContent = element+": "+questionData.Answers[element];
+        document.getElementById("answers").appendChild(item);
+      });
+    });
+
+    socket.on('finish quiz', function(quizData) {
+      document.getElementById("answers").innerHTML = "";
+      document.getElementById("question").innerText = "Dat was het!";
     });
   </script>

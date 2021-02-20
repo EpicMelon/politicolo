@@ -20,7 +20,7 @@ app.get('/room/:code', (req, res) => {
 // Attach express app to server
 var http = require('http');
 var server = http.createServer(app);
-server.listen(3000, "192.168.178.35", () => {
+server.listen(3000, "localhost", () => {
   console.log('listening on *:3000');
 });
 
@@ -29,17 +29,31 @@ var ios = require('socket.io-express-session');
 var io = require('socket.io')(server);
 io.use(ios(session)); // session support
 
-var room_counts = {};
-var max_room_id = 1000;
+// QUIZOOO
+// let questions = require('questions.json');
+var fs=require('fs');
+var data=fs.readFileSync('questions.json', 'utf8');
+var questions=JSON.parse(data);
 
+var room_counts = {};
+var question_count = {};
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// sockets
 io.on('connection', (socket) => {
   var room_id = "lobby";
 
   // --- Lobby ---
   socket.on('create_lobby', function () {
-    var given_id = Math.round(max_room_id * Math.random());
+    var given_id = '';
+    for (var i = 0; i < 4; i++) {
+      given_id += Math.floor(10 * Math.random());
+    }
 
-    // TODO check dat ie niet al bestaat enzo;
+    console.log("created id:" + given_id);
 
     socket.emit('goto', given_id);
   });
@@ -56,17 +70,19 @@ io.on('connection', (socket) => {
       room_counts[room] = 0;
     }
     room_counts[room] = room_counts[room] + 1;
+    question_count[room] = 0;
 
     io.to(room).emit("new user", room_counts[room]);
 
-    io.to(room_id).emit('status message', socket.handshake.session.username + " joined the room.");
-    console.log("[Room " + room_id + "] Someone joined");
+    io.to(room_id).emit('status message', socket.handshake.session.username + " is de kamer binnengekomen.");
+
+    console.log("[Room " + room_id + "] " + socket.handshake.session.username + " joined");
   });
 
   // Chat in room
   socket.on('chat message', (msg) => {
     io.to(room_id).emit('chat message', socket.handshake.session.username + ": " + msg);
-    console.log("[Room " + room_id + "] " + msg);
+    console.log("[Room " + room_id + "] " + socket.handshake.session.username + ": " + msg);
   });
 
   // Communication back
@@ -78,15 +94,31 @@ io.on('connection', (socket) => {
      
     io.to(room_id).emit("new user", room_counts[room_id]);
 
-    io.to(room_id).emit('status message', "Someone left the room.");
-    console.log("[Room " + room_id + "] Someone left");
+    io.to(room_id).emit('status message', socket.handshake.session.username  +" heeft de kamer verlaten.");
+    console.log("[Room " + room_id + "] " + socket.handshake.session.username + " left");
   });
 
   // set username
   socket.on('set username', function (username) {
+    io.to(room_id).emit('status message', socket.handshake.session.username  +" heeft zich hernoemd tot " + username + ".");
+
     socket.handshake.session.username = username;
     socket.handshake.session.save();
 
     console.log('Registered username: ' + socket.handshake.session.username);
+  });
+
+  // --- Quizoo ---
+  socket.on('new question', function () {
+    q_data = questions[question_count[room_id]]
+
+    if (q_data) {
+      io.to(room_id).emit('show question', q_data);
+    } else {
+      io.to(room_id).emit('finish quiz', 5);
+    }
+
+    // next question
+    question_count[room_id]++;
   });
 });

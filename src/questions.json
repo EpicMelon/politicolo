@@ -1,0 +1,62 @@
+[
+    {
+        "Question": "Who am I?",
+        "Correct": "a",
+        "Answers": {
+            "a": "The Server",
+            "b": "The Client",
+            "c": "A Human",
+            "d": "A small man"
+        }
+    },
+    {
+        "Question": "Who am I gonna be?",
+        "Correct": "b",
+        "Answers": {
+            "a": "The Human centipede",
+            "b": "The Ventje",
+            "c": "A Chrismas",
+            "d": "A Big Husband"
+        }
+    },
+    {
+        "Question": "Who was I?",
+        "Correct": "c",
+        "Answers": {
+            "a": "The Fighting maniac",
+            "b": "A Set-up",
+            "c": "Over the Rainbow",
+            "d": "Joy"
+        }
+    },
+    {
+        "Question": "Classic?",
+        "Correct": "d",
+        "Answers": {
+            "a": "Playstation Network",
+            "b": "Fire sale on the docks",
+            "c": "Squirrel",
+            "d": "Hospitalized frat-boy"
+        }
+    },
+    {
+        "Question": "What is love?",
+        "Correct": "a",
+        "Answers": {
+            "a": "Baby",
+            "b": "Dont",
+            "c": "Hurt",
+            "d": "Me"
+        }
+    },
+    {
+        "Question": "666",
+        "Correct": "b",
+        "Answers": {
+            "a": "Authorized clientelle",
+            "b": "Disgusted Cucumber",
+            "c": "Everymans work",
+            "d": "Aquaducts on the moon"
+        }
+    }
+]
