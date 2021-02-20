@@ -1,3 +1,8 @@
+// Our files
+const lobby_logic = require('./lobby_logic.js');
+
+lobby_logic.test();
+
 // initializing express-session middleware
 var Session = require('express-session');
 var SessionStore = require('session-file-store')(Session);
@@ -38,25 +43,12 @@ var questions=JSON.parse(data);
 var room_counts = {};
 var question_count = {};
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // sockets
 io.on('connection', (socket) => {
   var room_id = "lobby";
 
   // --- Lobby ---
-  socket.on('create_lobby', function () {
-    var given_id = '';
-    for (var i = 0; i < 4; i++) {
-      given_id += Math.floor(10 * Math.random());
-    }
-
-    console.log("created id:" + given_id);
-
-    socket.emit('goto', given_id);
-  });
+  lobby_logic.init(io, socket);
 
   // --- Rooms ---
 
