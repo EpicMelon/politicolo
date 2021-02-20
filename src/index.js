@@ -83,7 +83,11 @@ io.on('connection', (socket) => {
   socket.on('new question', function () {
     q_data = questions[question_count[room_id]]
 
-    io.to(room_id).emit('show question', q_data);
+    if (q_data) {
+      io.to(room_id).emit('show question', q_data);
+    } else {
+      io.to(room_id).emit('finish quiz', 5);
+    }
 
     // next question
     question_count[room_id]++;

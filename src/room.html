@@ -114,5 +114,10 @@
         item.textContent = element+": "+questionData.Answers[element];
         document.getElementById("answers").appendChild(item);
       });
-    })
+    });
+
+    socket.on('finish quiz', function(quizData) {
+      document.getElementById("answers").innerHTML = "";
+      document.getElementById("question").innerText = "Dat was het!";
+    });
   </script>
