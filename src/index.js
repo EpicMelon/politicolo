@@ -3,6 +3,8 @@ const lobby_logic = require('./lobby_logic.js');
 
 lobby_logic.test();
 
+const PORT = process.env.PORT || 3000;
+
 // initializing express-session middleware
 var Session = require('express-session');
 var SessionStore = require('session-file-store')(Session);
@@ -25,7 +27,7 @@ app.get('/room/:code', (req, res) => {
 // Attach express app to server
 var http = require('http');
 var server = http.createServer(app);
-server.listen(3000, "localhost", () => {
+server.listen(PORT, () => {
   console.log('listening on *:3000');
 });
 
