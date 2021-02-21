@@ -37,7 +37,7 @@ io.use(ios(session)); // session support
 // QUIZOOO
 // let questions = require('questions.json');
 var fs=require('fs');
-var data=fs.readFileSync('questions.json', 'utf8');
+var data=fs.readFileSync('src/questions.json', 'utf8');
 var questions=JSON.parse(data);
 
 var room_counts = {};
