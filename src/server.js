@@ -1,21 +1,23 @@
+// The game you want to play
+const game = require('./fundaguesser.js');
+
 // Set up
 var io;
 
 // Variables
 var room_id;
 var room_counts = {};
-var question_count = {};
-
-var fs=require('fs');
-var data=fs.readFileSync('src/questions.json', 'utf8');
-var questions=JSON.parse(data);
 
 var init = function(the_io) {
   io = the_io;
-  console.log("set up io");
+
+  game.init(the_io);
+
+  console.log("Set up server.");
 }
 
 var initSocket = function (socket) {
+  // initialize room
   socket.username = "Anoniem"
   socket.room_id = "lobby"
 
@@ -27,18 +29,8 @@ var initSocket = function (socket) {
 
   socket.on('set username', (username) => changeUsername(socket, username));
 
-  socket.on('new question', function () {
-    q_data = questions[question_count[room_id]]
-
-    if (q_data) {
-      io.to(room_id).emit('show question', q_data);
-    } else {
-      io.to(room_id).emit('finish quiz', 5);
-    }
-
-    // next question
-    question_count[room_id]++;
-  });
+  // initialize game
+  game.initSocket(socket);
 }
 
 function randomLobbyId (socket) {
@@ -63,12 +55,10 @@ function joinRoom(socket, room) {
     room_counts[room] = 0;
   }
   room_counts[room] = room_counts[room] + 1;
-  question_count[room] = 0;
 
   io.to(room).emit("new user", room_counts[room]);
 
   io.to(room).emit('status message', socket.username + " is de kamer binnengekomen.");
-
   console.log("[Room " + room + "] " + socket.username + " joined");
 }
 

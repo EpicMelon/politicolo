@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Politicolo.nl, voor jong en oud!</title>
+    <link rel="stylesheet" type="text/css" href="../css/lobbystyle.css" />
+  </head>
+
+  <body>
+    <center><h1>funda guesser</h1> </center>
+    <center><form id="create button" action="" style="padding: 0px 0px">
+      <button type="submit">Start spel!</button> </form> </center>
+    <center><form id="join button" action="">
+      <input id="code input" placeholder="0000" autocomplete="off" maxlength="4"> 
+      <button> Join</button> </form> </center>
+  </body>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+
+    // create lobby
+    var create_button = document.getElementById('create button');
+
+    create_button.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      let result = socket.emit('create_lobby');
+      
+      socket.on('goto', function(id) {
+        window.location.replace(window.location + "room/" + id);
+      });
+
+    });
+
+    // join lobby
+    var join_button = document.getElementById('join button');
+    var code = document.getElementById('code input');
+
+    join_button.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (code.value != '') {        
+        window.location.replace(window.location + "room/" + code.value);
+      }
+
+    });
+  </script>

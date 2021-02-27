@@ -1,6 +1,7 @@
 // Our files
 const server = require('./server.js');
 
+
 // initializing express-session middleware
 var Session = require('express-session');
 var SessionStore = require('session-file-store')(Session);
@@ -9,15 +10,17 @@ var session = Session({store: new SessionStore({path: __dirname+'/tmp/sessions'}
 // create express app
 var express = require('express');
 var app = express();
+console.log('making static: ' + 'public');
+app.use(express.static('public'));
 app.use(session);
 
 // Pages
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+app.get('', (req, res) => {
+  res.sendFile('public/html/index.html', {root:'./'});
 });
 
-app.get('/room/:code', (req, res) => {
-  res.sendFile(__dirname + '/room.html');
+app.get('/room/([0-9]+)$', (req, res) => {
+  res.sendFile('public/html/room.html', {root:'./'});
 });
 
 // Attach express app to server
