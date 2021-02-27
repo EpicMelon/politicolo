@@ -10,8 +10,12 @@ var session = Session({store: new SessionStore({path: __dirname+'/tmp/sessions'}
 // create express app
 var express = require('express');
 var app = express();
-console.log('making static: ' + 'public');
+
 app.use(express.static('public'));
+
+var favicon = require('serve-favicon');
+app.use(favicon('public/images/favicon.ico'));
+
 app.use(session);
 
 // Pages
